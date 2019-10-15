@@ -92,9 +92,9 @@ ylabel('$C_d$','Interpreter','latex')
 [Cd_Theory] = compute_theoretical_Cd(Re_smooth(1:11),Re_low(1:11),Re_high(1:11));
 
 figure('Name','Re vs Cd Theory');
-hold on
 
 errorbar(Re_smooth(1:11),Cd_smooth(1:11),Ucd_smooth(1:11),'ob')
+hold on
 errorbar(Re_low(1:11),Cd_low(1:11),Ucd_low(1:11),'og')
 errorbar(Re_high(1:11),Cd_high(1:11),Ucd_high(1:11),'oc')
 
@@ -102,9 +102,10 @@ plot(Re_smooth(1:11),Cd_Theory(1,:),'r','LineWidth',2)
 plot(Re_low(1:11),Cd_Theory(2,:),'y','LineWidth',2)
 plot(Re_high(1:11),Cd_Theory(3,:),'k','LineWidth',2)
 
-% set(gca,'XScale','log', 'YScale','log')
+set(gca,'XScale','log', 'YScale','log')
+xlim([.9*min(Re_smooth) 1.1*max(Re_low)])
 grid on
-legend('Increasing Smooth','Increasing Low','Increasing High','Theory Smooth','Theory Low','Theory High','Location','northeast')
+legend('Increasing Smooth','Increasing Low','Increasing High','Theory Smooth','Theory Low','Theory High','Location','southoutside')
 xlabel('$Re$','Interpreter','latex')
 ylabel('$C_d$','Interpreter','latex')
 
