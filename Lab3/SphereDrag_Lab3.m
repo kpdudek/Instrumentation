@@ -41,15 +41,15 @@ fprintf('Lab : %5.5e\n',Syx_press_lab)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 spheres = {'Smooth','Low Rough','High Rough'};
 sphere_diam = [.1014476,.1302,.10304]; %m
-rho_water = 997.59; % kg / m^3 for water
+rho_water = 1.193; %997.59; % kg / m^3 for water
 rho_air = 1.193; % kg / m^3
 mu = 15.32 * 10^-6; % m^2 / s for air
 
-manometer_smooth = [1.62,2.4,3.4,3.95,4.55,5.2,5.85,66.5,7.35,8.0,8.75,8.0,...
+manometer_smooth = [1.62,2.4,3.4,3.95,4.55,5.2,5.85,6.5,7.35,8.0,8.75,8.0,...
     7.25,6.5,5.8,5.15,4.5,3.9,3.4,2.9,2.4]';
 volt_smooth = [.1341,.1433,.1540,.16,.1660,.1717,.1777,.1830,.1870,.1830,.1550,...
     .1825,.1872,.1837,.1780,.1720,.1661,.16,.1541,.1489,.1438]'./1000;
-manometer_low = [1.62,2.4,3.4,33.95,4.55,5.2,5.9,6.6,7.3,8.05,8.7,8.0,...
+manometer_low = [1.62,2.4,3.4,3.95,4.55,5.2,5.9,6.6,7.3,8.05,8.7,8.0,...
     7.25,6.5,5.8,5.15,4.5,4.0,3.4,2.9,2.4]';
 volt_low = [.1323,.1423,.1548,.16,.1650,.1695,.1733,.1730,.1717,.1680,...
     .1407,.1670,.1720,.1745,.1740,.1701,.1646,.1595,.1537,.1484,.1433]'./1000;
@@ -86,6 +86,7 @@ errorbar(Re_high(1:11),Cd_high(1:11),Ucd_high(1:11),'oc');errorbar(Re_high(12:en
 legend('Increasing Smooth','Decreasing Smooth','Increasing Low','Decreasing Low','Increasing High','Decreasing High','Location','northeast')
 xlabel('$Re$','Interpreter','latex')
 ylabel('$C_d$','Interpreter','latex')
+xlim([.9*min(Re_smooth) 1.1*max(Re_low)])
 
 % Plotting the coefficient of drag vs reynolds number for increasing
 % Plotting the computed theoretical value
@@ -105,7 +106,7 @@ plot(Re_high(1:11),Cd_Theory(3,:),'k','LineWidth',2)
 set(gca,'XScale','log', 'YScale','log')
 xlim([.9*min(Re_smooth) 1.1*max(Re_low)])
 grid on
-legend('Increasing Smooth','Increasing Low','Increasing High','Theory Smooth','Theory Low','Theory High','Location','southoutside')
+legend('Increasing Smooth','Increasing Low','Increasing High','Theory Smooth','Theory Low','Theory High','Location','southeast')
 xlabel('$Re$','Interpreter','latex')
 ylabel('$C_d$','Interpreter','latex')
 
@@ -143,13 +144,13 @@ end
 function [coeff,Syx] = pressure_transducer_calibration()
 %Measured lab values
 water_height = [.03,.94,2.4,3.4,4.6,5.9,7.3,8.8,7.3,5.85,4.5,3.4,2.4,.94,.04];
-volt = [.002,.09,.239,.338,.456,.584,.762,.875,.726,.583,.455,.340,.239,.089,.002]./1000;
-volt_std = [.017,.078,.077,.082,.081,.083,.072,.073,.071,.084,.084,.080,.079,.079,.017]./1000;
+volt = [.002,.09,.239,.338,.456,.584,.762,.875,.726,.583,.455,.340,.239,.089,.002];
+volt_std = [.017,.078,.077,.082,.081,.083,.072,.073,.071,.084,.084,.080,.079,.079,.017];
 
 % Plotting raw data
 figure('Name','Pressure Transducer Calibration')
 plot(water_height,volt,'.','MarkerSize',12)
-xlabel('Dynamic Pressure ($\frac{N}{m^2}$)','Interpreter','latex')
+xlabel('Dynamic Pressure ($in H_{2}O$)','Interpreter','latex')
 ylabel('Voltage ($V$)','Interpreter','latex')
 hold on
 
@@ -162,6 +163,7 @@ plot(water_height,volt_fit)
 
 % Standard error of the fit
 Syx = standard_error_fit(volt,volt_fit);
+
 end
 
 function Syx = standard_error_fit(y_meas,y_fit)
@@ -220,15 +222,27 @@ for iRe = 1:length(error_Cd)
 end
 fprintf('\n')
 
+
 %%%  Compare the manual readings to the computer ones
 man_press = inH2O_to_Pa(man_read);
 man_force = get_sensor_value(load_coeffs,man_load_volt);
+man_velocity = sqrt((2.*man_press)./rho_water);
 
-man_Cd = (2.*man_force) ./ (rho_air .* (velocity.^2) .* S);
+man_Cd = (2.*man_force) ./ (rho_air .* (man_velocity.^2) .* S);
+man_Re = (rho_air .* man_velocity .* diam) ./ (mu);
+
 man_error_Cd = (abs(Cd_lab - man_Cd) ./ Cd_lab) .* 100;
+man_error_Re = (abs(Re_lab - man_Re) ./ Re_lab) .* 100;
+
 fprintf('\nMANUAL Cd percent error for: %s\n',sphere)
 for iCd = 1:length(man_error_Cd)
     fprintf('%.2f ',man_error_Cd(iCd))
+end
+fprintf('\n')
+
+fprintf('\nMANUAL Re percent error for: %s\n',sphere)
+for iRe = 1:length(man_error_Re)
+    fprintf('%.2f ',man_error_Re(iRe))
 end
 fprintf('\n')
 
