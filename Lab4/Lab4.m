@@ -3,7 +3,7 @@ close all
 clc
 
 thermistor()
-
+RTD()
 end
 
 function out = read_data(suffix)
@@ -19,6 +19,12 @@ end
 
 function Ro = Volt_to_Resistance(Vo,Vi,R)
 Ro = (R./(Vo./Vi)) - R;
+end
+
+function Syx = standard_error_fit(y_meas,y_fit)
+nu = length(y_meas)-2;
+Syx = sqrt(sum((y_fit-y_meas).^2)/nu);
+%disp({'Syx: ',Syx})
 end
 
 function thermistor()
@@ -63,6 +69,44 @@ ylabel('$\frac{1}{T}(^{\circ}C)$','Interpreter','latex')
 
 end
 
-function 
+function RTD()
+% Read data from csv files
+rtdData = read_data('rtd');
+rtd10Data = read_data('rtd_10');
+rtdDataVd = read_data('rtd_vd');
+rtd10DataVd = read_data('rtd_vd_10');
+
+% Averages and standard deviations
+ave_rtdData = mean(rtdData);
+ave_rtd10Data = mean(rtd10Data);
+ave_rtdDataVd = mean(rtdDataVd);
+ave_rtd10DataVd = mean(rtd10DataVd);
+
+std_rtdData = std(rtdData);
+std_rtd10Data = std(rtd10Data);
+std_rtdDataVd = std(rtdDataVd);
+std_rtd10DataVd = std(rtd10DataVd);
+
+% Lab specific values
+temp = [0,15,30,45,60];
+
+% Make vector of data to be fit and then perform linear regression
+voltData = [ave_rtdData,ave_rtd10Data];
+tempData = [temp,temp];
+coeff = polyfit(tempData,voltData,1);
+volt_fit = coeff(2) + coeff(1).*tempData;
+
+% Plot voltage vs temperature
+figure('Name','RTD Voltage vs Temperature')
+plot(temp,ave_rtdData,'.','MarkerSize',12)
+hold on
+plot(temp,ave_rtd10Data./10,'.','MarkerSize',12)
+%plot(temp,ave_rtdDataVd,'MarkerSize',12)
+%plot(temp,ave_rtd10DataVd,'MarkerSize',12)
+plot(tempData,volt_fit,'r')
+%legend('Bridge RTD', '10dB Bridge RTD', 'Voltage Divider RTD','10dB Voltage Divider RTD')
+xlabel('Temperature ($^{\circ}C$)','Interpreter','latex')
+ylabel('Voltage (V)')
+end
 
 
