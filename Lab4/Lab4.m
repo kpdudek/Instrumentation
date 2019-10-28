@@ -96,6 +96,10 @@ tempData = [temp,temp];
 coeff = polyfit(tempData,voltData,1);
 volt_fit = coeff(2) + coeff(1).*tempData;
 
+% Standard error of the fit
+Syx = standard_error_fit(voltData,volt_fit);
+
+
 % Plot voltage vs temperature
 figure('Name','RTD Voltage vs Temperature')
 plot(temp,ave_rtdData,'.','MarkerSize',12)
