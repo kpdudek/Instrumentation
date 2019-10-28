@@ -89,16 +89,20 @@ std_rtd10DataVd = std(rtd10DataVd);
 
 % Lab specific values
 temp = [0,15,30,45,60];
+tv_3 = 3.182;
+tv_99 = 1.96;
 
-% Make vector of data to be fit and then perform linear regression
-voltData = [ave_rtdData,ave_rtd10Data];
+% Make vector of data from lab
+voltData = [ave_rtdData,ave_rtd10Data./10];
 tempData = [temp,temp];
+std_RTD = [std_rtdData,std_rtd10Data];
+
+% Perform linear regression
 coeff = polyfit(tempData,voltData,1);
 volt_fit = coeff(2) + coeff(1).*tempData;
 
 % Standard error of the fit
 Syx = standard_error_fit(voltData,volt_fit);
-
 
 % Plot voltage vs temperature
 figure('Name','RTD Voltage vs Temperature')
@@ -111,6 +115,14 @@ plot(tempData,volt_fit,'r')
 %legend('Bridge RTD', '10dB Bridge RTD', 'Voltage Divider RTD','10dB Voltage Divider RTD')
 xlabel('Temperature ($^{\circ}C$)','Interpreter','latex')
 ylabel('Voltage (V)')
+
+%%% UNCERTAINTY ANALYSIS
+Up_fit = tv_3 * Syx;
+Up_mean = tv_99.* (std_RTD./sqrt(100));
+U_adc = .5 * (20/2^16);
+UT_acc = 1;
+UT_res = .05;
+
 end
 
 
