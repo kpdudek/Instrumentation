@@ -97,6 +97,7 @@ analyze_data(ave_rtd10DataVd,std_rtd10DataVd,'RTD with Voltage Divider (10dB)')
 end
 
 function analyze_data(volt,std,iden)
+fprintf('\n---  %s | Data  ---\n',iden)
 temp = [0,15,30,45,60];
 tv_3 = 3.182;
 tv_99 = 1.96;
@@ -104,9 +105,11 @@ tv_99 = 1.96;
 % Perform linear regression
 coeff = polyfit(temp,volt,1);
 volt_fit = coeff(2) + coeff(1).*temp;
+fprintf('a0 = %5.3e\na1 = %5.3e\n',coeff(2),coeff(1))
 
 % Standard error of the fit
 Syx = standard_error_fit(volt,volt_fit);
+fprintf('Syx = %5.3e\n',Syx)
 
 %%% Uncertainty
 % Given
@@ -121,6 +124,11 @@ U_volt = sqrt(Up_fit^2 + Up_mean.^2 + U_adc^2);
 U_temp = sqrt(UT_acc^2 + UT_res^2);
 
 uncert = sqrt((U_volt/coeff(1)).^2 + U_temp^2);
+fprintf('Up Fit = %5.3e\n',Up_fit)
+fprintf('Up Mean = %5.3e\n',Up_mean)
+fprintf('Total U Voltage = %5.3e\n',U_volt)
+fprintf('Total U Temperature = %5.3e\n',U_temp)
+fprintf('Uncertainty = %5.3f\n',uncert)
 
 % Plot calibration
 figure('Name',iden)
@@ -136,7 +144,7 @@ figure('Name',sprintf('%s, uncert',iden))
 errorbar(volt,temp,uncert,'.','MarkerSize',12)
 hold on
 %plot(temp,volt_fit,'r')
-legend(iden,'Linear Fit')
+legend(iden)%,'Linear Fit')
 ylabel('Temperature ($^{\circ}C$)','Interpreter','latex')
 xlabel('Voltage (V)')
 
