@@ -78,10 +78,10 @@ rtd10DataVd = read_data('rtd_vd_10');
 
 % Averages and standard deviations
 ave_rtdData = mean(rtdData);
-ave_rtd10Data = mean(rtd10Data ./ (10^.5));
+ave_rtd10Data = mean(rtd10Data);% ./ (10^.5));
 
 ave_rtdDataVd = mean(rtdDataVd);
-ave_rtd10DataVd = mean(rtd10DataVd ./ (10^.5));
+ave_rtd10DataVd = mean(rtd10DataVd);% ./ (10^.5));
 
 std_rtdData = std(rtdData);
 std_rtd10Data = std(rtd10Data);
