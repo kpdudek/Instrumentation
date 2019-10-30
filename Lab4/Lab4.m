@@ -138,15 +138,19 @@ plot(temp,volt_fit,'r')
 legend(iden,'Linear Fit')
 xlabel('Temperature ($^{\circ}C$)','Interpreter','latex')
 ylabel('Voltage (V)')
+% xlim([min(temp)*.9 max(temp)*1.1])
+% ylim([min(volt_fit)*.9 max(volt_fit)*1.1])
 
 % Plot uncertainty
+temp_func = (volt - coeff(2)) ./ coeff(1);
 figure('Name',sprintf('%s, uncert',iden))
-errorbar(volt,temp,uncert,'.','MarkerSize',12)
+errorbar(volt,temp_func,uncert,'.','MarkerSize',12)
 hold on
-%plot(temp,volt_fit,'r')
-legend(iden)%,'Linear Fit')
+legend(iden)
 ylabel('Temperature ($^{\circ}C$)','Interpreter','latex')
 xlabel('Voltage (V)')
+% xlim([min(volt)*.9 max(volt)*1.1])
+% ylim([min(temp_func)*.9 max(temp_func)*1.1])
 
 end
 
