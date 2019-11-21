@@ -21,6 +21,8 @@ wnat = sqrt(K/m);
 fprintf('Spring constant: %5.5f\n',K)
 fprintf('Natural Frequency: %5.5f\n',wnat)
 
+Syx = standard_error_fit(delta,linFit);
+
 
 % Reponse Data
 figure('Name','Response Data')
@@ -72,6 +74,12 @@ fprintf('Td: %5.5f\n',Td)
 wd = 2*pi / Td;
 fprintf('Wd: %5.5f\n',wd)
 
+
+
+function Syx = standard_error_fit(y_meas,y_fit)
+nu = length(y_meas)-2;
+Syx = sqrt(sum((y_fit-y_meas).^2)/nu);
+end
 
 
 
