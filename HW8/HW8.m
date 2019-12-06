@@ -21,6 +21,8 @@ wnat = sqrt(K/m);
 fprintf('Spring constant: %5.5f\n',K)
 fprintf('Natural Frequency: %5.5f\n',wnat)
 
+Syx = standard_error_fit(delta,linFit);
+
 
 % Reponse Data
 figure('Name','Response Data')
@@ -49,11 +51,14 @@ figure('Name','Free Decay')
 time = HW8freedecaydata(:,1);
 volt = HW8freedecaydata(:,2);
 
-plot(time,volt,'b')
+plot(time,volt,'b','LineWidth',2)
 hold on 
 peakT = [.172,.566,.98,1.4];
 peakV = [.425,.435,.479,.513];
 plot(peakT,peakV,'ro','MarkerSize',8)
+
+xlabel('Time (s)','Interpreter','latex')
+ylabel('Voltage (V)','Interpreter','latex')
 
 figure('Name','Exponential Fit')
 ln_env = -1*log(peakV);
@@ -61,7 +66,10 @@ plot(peakT,ln_env,'b.','MarkerSize',12)
 hold on 
 lnCoeff = polyfit(peakT,ln_env,1);
 linVolt = polyval(lnCoeff,peakT);
-plot(peakT,linVolt,'r')
+plot(peakT,linVolt,'r','LineWidth',2)
+
+xlabel('Time (s)')
+ylabel('$-ln(Voltage)$','Interpreter','latex')
 
 fprintf('Linear slope: %5.5f\n',lnCoeff(1))
 
@@ -72,6 +80,12 @@ fprintf('Td: %5.5f\n',Td)
 wd = 2*pi / Td;
 fprintf('Wd: %5.5f\n',wd)
 
+
+
+function Syx = standard_error_fit(y_meas,y_fit)
+nu = length(y_meas)-2;
+Syx = sqrt(sum((y_fit-y_meas).^2)/nu);
+end
 
 
 
