@@ -15,7 +15,7 @@ filtData = data.^2;
 trigThresh = 4;
 
 % Must be adjusted based on pulse height
-echoThresh = .003;
+echoThresh = .0025;
 
 % Increase if plot is moving right
 % Decrease if plot is moving left
@@ -40,8 +40,8 @@ while firstEchoTime+numberSamplesPerPulse <= length(filtData)
 pulse=filtData(firstEchoTime:firstEchoTime+numberSamplesPerPulse);
 
 % Uncomment for debugging the samples per pulse
-plot(pulse)
-hold on
+% plot(pulse)
+% hold on
 
 % Go through the indices after the trigger width until the value is above
 % the echo voltage threshold
@@ -79,33 +79,49 @@ time = [time, prev_time + pulseTime]; %prev_time+travelTime];
 dist = [dist, travelDistance_Cal];
 
 
-plot(sampleIndex,pulse(sampleIndex),'or')
-xlim([0 1200])
-ylim([0 .04])
-hold off
+% plot(sampleIndex,pulse(sampleIndex),'or')
+% xlim([0 1200])
+% ylim([0 .04])
+% hold off
 %%%%%% UPDATE LOOP VARIABLES %%%%%%%
 % Add the samples per pulse
 firstEchoTime = firstEchoTime+numberSamplesPerPulse;
 prev_time = prev_time+pulseTime;
 end
 
-% Plot it so we can see what the last frame looks like. It should start
-% exactly at the beginning of a trigger
-% figure()
-% plot(pulse)
-
-
-% for i = 1:length(dist)
-%     if dist(i) > .8
-%         dist(i) = .8;
-%     end
-% end
-
 % Plot distance vs time
 figure()
 plot(time,dist)
 xlabel('Time (s)')
 ylabel('Distance From Sensor (m)')
+hold on
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Free Decay Analysis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+xVal = [2.075,2.565,3.056,3.546,3.999,4.451,4.942];
+yVal = [.3593,.4225,.4657,.4966,.5178,.5377,.5528];
+plot(xVal,yVal,'ro')
+
+figure('Name','Exponential Fit')
+ln_env = -1*log(yVal);
+plot(xVal,ln_env,'b.','MarkerSize',12)
+hold on 
+lnCoeff = polyfit(xVal,ln_env,1);
+linDist = polyval(lnCoeff,xVal);
+plot(xVal,linDist,'r','LineWidth',2)
+
+xlabel('Time (s)')
+ylabel('$-ln(Distance)$','Interpreter','latex')
+
+fprintf('Linear slope: %5.5f\n',lnCoeff(1))
+
+Td = mean([2.565-2.075, 3.056-2.565, 3.546-3.056, 3.999-3.546, 4.451-3.999, 4.942-4.451]);
+fprintf('Td: %5.5f\n',Td)
+
+wd = 2*pi / Td;
+fprintf('Wd: %5.5f\n',wd)
 
 
 
@@ -113,79 +129,3 @@ ylabel('Distance From Sensor (m)')
 
 
 
-
-
-
-
-
-
-
-% for iData = 2:length(filtData)-1
-%     if (filtData(iData)==-1) && ((filtData(iData-1)~=0) || (filtData(iData+1)~=0))
-%         filtData(iData)= mean([filtData(iData-1),filtData(iData+1)]);
-%     end
-% end
-% 
-% % plot the filtered data vs index
-% 
-% plot(filtData)
-% 
-% % Loop through the data and get time between signal going high and then to
-% % low. This loop counts the time for both the trigger pulse and the echo
-% % pulse and stores them in the same vector
-% PulseTime = [];
-% PulseHeight = [];
-% time = 0;
-% timeEnd = 0;
-% trig = 0;
-% pulseB = 0;
-% for iData = 1:length(filtData)
-%     if (filtData(iData) > 0) && (trig == 0) && (filtData(iData-1) == -1)
-%         time = iData * fs;
-%         
-%         pulseB = iData;
-%         trig = 1;
-%     end
-%     
-%    if (filtData(iData) == -1) && (trig == 1) %&& (filtData(iData+1) == 0)
-%        timeEnd = iData * fs;
-%        PulseTime(1,end+1) = time;
-%        PulseTime(2,end+1) = timeEnd;
-%        
-%        pulVolts = filtData(pulseB:iData);
-%        PulseHeight(end+1) = sum(pulVolts);
-%        time = 0;
-%        trig = 0;
-%    end 
-% end
-% len = 1:length(PulseTime(1,:));
-% 
-% end
-% 
-% 
-% 
-% 
-% 
-% % 
-% % times = struct('Time',[]);
-% % dataCount = 1;
-% % timeCount = 0;
-% % trig = 0;
-% % for iData = 1:length(filtData)
-% %     if filtData(iData) ~= 0 && trig == 0
-% %         trig = 1;
-% %     elseif (trig == 1) && (filtData(iData) == 0)
-% %         trig = 2;
-% %     elseif trig == 1
-% %         timeCount = timeCount + fs;
-% %     elseif trig == 2
-% %         timeCount = timeCount + fs;
-% %     elseif (trig == 2) && (filtData(iData) ~= 0)
-% %         times(dataCount).time = timeCount;
-% %         dataCount = dataCount + 1;
-% %         trig = 3;
-% %     elseif (trig == 3) && (filtData(iData) == 0)
-% %         timeCount = 0;
-% %         trig = 0;
-% %     end
-% % end
