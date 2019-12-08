@@ -1,9 +1,9 @@
 close all; clc; clear;
 
 % load('Forced_12.mat');
-% load('Forced_100.mat');
+load('Forced_100.mat');
 % load('FreeDecay_LowerRelease.mat')
-load('FreeDecay_UpperRelease.mat')
+% load('FreeDecay_UpperRelease.mat')
 
 % Frequency
 fs = 1/250000;
@@ -15,7 +15,7 @@ filtData = data.^2;
 trigThresh = 4;
 
 % Must be adjusted based on pulse height
-echoThresh = .003;
+echoThresh = .012;
 
 % Increase if plot is moving right
 % Decrease if plot is moving left
@@ -23,7 +23,7 @@ echoThresh = .003;
 % Motor Speed 100: 9418
 % Free Decay Upper: 9431 - start at 200 pulses
 % Free Decay Lower: 9435
-numberSamplesPerPulse = 9431;
+numberSamplesPerPulse = 9418;
 
 % Arrays to store the data and a time variable to get absolute time
 time = [];
@@ -46,7 +46,7 @@ hold on
 % Go through the indices after the trigger width until the value is above
 % the echo voltage threshold
 foundPulse = 0;
-sampleIndex = 350;
+sampleIndex = 400;
 while ~foundPulse
     if sampleIndex > numberSamplesPerPulse
         disp("FUCK NO PULSE FOUND")
@@ -83,6 +83,8 @@ plot(sampleIndex,pulse(sampleIndex),'or')
 xlim([0 1200])
 ylim([0 .04])
 hold off
+xlabel('Samples')
+ylabel('Distance From Sensor (m)')
 %%%%%% UPDATE LOOP VARIABLES %%%%%%%
 % Add the samples per pulse
 firstEchoTime = firstEchoTime+numberSamplesPerPulse;
